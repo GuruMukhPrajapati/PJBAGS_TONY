@@ -87,10 +87,11 @@ const Add = ({ token }) => {
         <div>
           <p className='mb-2 text-gray-300'>Sub category</p>
           <select onChange={(e) => setSubCategory(e.target.value)} className='px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded'>
-            <option value='Real Silver Poshak'>Real Silver Poshak</option>
-            <option value='Bottomwear'>Bottomwear</option>
-            <option value='Winterwear'>Winterwear</option>
-          </select>
+  <option value='Sports'>Sports</option>
+  <option value='College'>College</option>
+  <option value='TrolleyBag'>Trolley Bag</option>
+  <option value='Outdoor'>Outdoor</option>
+</select>
         </div>
         <div>
           <p className='mb-2 text-gray-300'>Product Price</p>

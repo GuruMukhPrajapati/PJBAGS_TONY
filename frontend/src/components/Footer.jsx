@@ -9,9 +9,9 @@ const Footer = () => {
         <div>
             <img src={assets.logo} className='mb-5 w-32' alt="" />
             <p className='w-full md:w-2/3 text-gray-600'>
-            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+            "At PJ Bags, we believe that your accessories should not just complete your look but elevate your entire experience. Our bags are thoughtfully crafted to blend contemporary designs with exceptional functionality, making sure you’re always ready to face the day with confidence and style."
             </p>
-        </div>
+        </div>  
 
         <div>
             <p className='text-xl font-medium mb-5'>COMPANY</p>
@@ -26,8 +26,8 @@ const Footer = () => {
         <div>
             <p className='text-xl font-medium mb-5'>GET IN TOUCH</p>
             <ul className='flex flex-col gap-1 text-gray-600'>
-                <li>+91 82391 40467</li>
-                <li>contact@Dailyshoppinyou.com</li>
+                <li>+91 9694543817</li>
+                <li>praveenjoshiw@gmail.com</li>
             </ul>
         </div>
 
