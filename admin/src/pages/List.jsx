@@ -47,7 +47,7 @@ const List = ({ token }) => {
   }, [])
 
   return (
-    <div className='bg-gray-900 text-white min-h-screen p-4'>
+    <div className='bg-[#C4D9FF] text-white min-h-screen p-4'>
       <p className='mb-2 text-lg font-bold'>All Products List</p>
       <div className='flex flex-col gap-2'>
 

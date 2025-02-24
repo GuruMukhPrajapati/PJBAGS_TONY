@@ -45,7 +45,7 @@ const Orders = ({ token }) => {
   }, [token])
 
   return (
-    <div className='bg-gray-900 text-white min-h-screen p-4 rounded-lg'>
+    <div className='bg-[#C4D9FF] text-white min-h-screen p-4 rounded-lg'>
       <h3 className='text-lg font-bold mb-4'>Order Page</h3>
       <div>
         {
