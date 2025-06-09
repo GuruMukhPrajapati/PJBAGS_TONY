@@ -40,40 +40,83 @@ const PlaceOrder = () => {
         switch (name) {
             case 'firstName':
             case 'lastName':
-                if (!/^[A-Za-z\s]{2,30}$/.test(value)) {
-                    error = 'Only letters allowed, 2-30 characters';
+                if (!/^[A-Za-z]{3,30}$/.test(value)) {
+                    error = 'Only letters allowed, 3-30 characters';
                 }
                 break;
             
             case 'email':
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                    error = 'Please enter a valid email address';
+                if (!/^[a-zA-Z][^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    error = 'Email must start with a letter and follow username@domainname format';
                 }
                 break;
 
             case 'street':
-                if (value.length < 5) {
+                if (!/^\d{2,4}.*/.test(value)) {
+                    error = 'Street address must start with 2-4 digits';
+                } else if (value.length < 5) {
                     error = 'Street address must be at least 5 characters';
+                }
+                
+                // Check if street name is not the same as city, state, or country
+                if (value.toLowerCase() === formData.city.toLowerCase() || 
+                    value.toLowerCase() === formData.state.toLowerCase() || 
+                    value.toLowerCase() === formData.country.toLowerCase()) {
+                    error = 'Street name cannot be the same as city, state, or country';
                 }
                 break;
 
             case 'city':
-            case 'state':
-            case 'country':
-                if (!/^[A-Za-z\s]{2,30}$/.test(value)) {
+                if (/^\d/.test(value)) {
+                    error = 'City name cannot start with a number';
+                } else if (!/^[A-Za-z\s]{2,30}$/.test(value)) {
                     error = 'Only letters allowed, 2-30 characters';
+                }
+                
+                // Check if city name is not the same as street, state, or country
+                if (value.toLowerCase() === formData.state.toLowerCase() || 
+                    value.toLowerCase() === formData.country.toLowerCase()) {
+                    error = 'City name cannot be the same as state or country';
+                }
+                break;
+
+            case 'state':
+                if (/^\d/.test(value)) {
+                    error = 'State name cannot start with a number';
+                } else if (!/^[A-Za-z\s]{2,30}$/.test(value)) {
+                    error = 'Only letters allowed, 2-30 characters';
+                }
+                
+                // Check if state name is not the same as city or country
+                if (value.toLowerCase() === formData.city.toLowerCase() || 
+                    value.toLowerCase() === formData.country.toLowerCase()) {
+                    error = 'State name cannot be the same as city or country';
+                }
+                break;
+
+            case 'country':
+                if (/^\d/.test(value)) {
+                    error = 'Country name cannot start with a number';
+                } else if (!/^[A-Za-z\s]{2,30}$/.test(value)) {
+                    error = 'Only letters allowed, 2-30 characters';
+                }
+                
+                // Check if country name is not the same as city or state
+                if (value.toLowerCase() === formData.city.toLowerCase() || 
+                    value.toLowerCase() === formData.state.toLowerCase()) {
+                    error = 'Country name cannot be the same as city or state';
                 }
                 break;
 
             case 'zipcode':
-                if (!/^\d{5,6}$/.test(value)) {
-                    error = 'Zipcode must be 5-6 digits';
+                if (!/^\d{6}$/.test(value)) {
+                    error = 'Zipcode must be exactly 6 digits, no letters or special characters';
                 }
                 break;
 
             case 'phone':
-                if (!/^\d{10,12}$/.test(value)) {
-                    error = 'Phone number must be 10-12 digits';
+                if (!/^(\+91)?\d{10}$/.test(value)) {
+                    error = 'Phone number must start with +91 and have 10 digits, no letters';
                 }
                 break;
 
@@ -87,14 +130,31 @@ const PlaceOrder = () => {
         const name = event.target.name;
         const value = event.target.value;
         
-        const error = validateField(name, value);
-        
-        setErrors(prev => ({
-            ...prev,
-            [name]: error
-        }));
-
         setFormData(data => ({ ...data, [name]: value }));
+        
+        // For fields that need to be validated against other field values
+        if (['street', 'city', 'state', 'country'].includes(name)) {
+            // Re-validate all address fields that might depend on each other
+            const streetError = validateField('street', name === 'street' ? value : formData.street);
+            const cityError = validateField('city', name === 'city' ? value : formData.city);
+            const stateError = validateField('state', name === 'state' ? value : formData.state);
+            const countryError = validateField('country', name === 'country' ? value : formData.country);
+            
+            setErrors(prev => ({
+                ...prev,
+                street: streetError,
+                city: cityError,
+                state: stateError,
+                country: countryError
+            }));
+        } else {
+            // For other fields, just validate the current field
+            const error = validateField(name, value);
+            setErrors(prev => ({
+                ...prev,
+                [name]: error
+            }));
+        }
     };
 
     const initPay = (order) => {
@@ -125,6 +185,11 @@ const PlaceOrder = () => {
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
+
+        // Format phone number if it doesn't start with +91
+        if (formData.phone && !formData.phone.startsWith('+91')) {
+            formData.phone = '+91' + formData.phone.replace(/^\+91/, '');
+        }
 
         // Validate all fields
         let hasErrors = false;
@@ -245,7 +310,7 @@ const PlaceOrder = () => {
                         value={formData.email} 
                         className={`border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded py-1.5 px-3.5 w-full`} 
                         type="email" 
-                        placeholder='Email address' 
+                        placeholder='Email' 
                     />
                     {errors.email && <p className='text-red-500 text-xs mt-1'>{errors.email}</p>}
                 </div>
@@ -258,7 +323,7 @@ const PlaceOrder = () => {
                         value={formData.street} 
                         className={`border ${errors.street ? 'border-red-500' : 'border-gray-300'} rounded py-1.5 px-3.5 w-full`} 
                         type="text" 
-                        placeholder='Street' 
+                        placeholder='Street (start with 2-4 digits)' 
                     />
                     {errors.street && <p className='text-red-500 text-xs mt-1'>{errors.street}</p>}
                 </div>
@@ -297,7 +362,8 @@ const PlaceOrder = () => {
                             name='zipcode' 
                             value={formData.zipcode} 
                             className={`border ${errors.zipcode ? 'border-red-500' : 'border-gray-300'} rounded py-1.5 px-3.5 w-full`} 
-                            type="number" 
+                            type="text" 
+                            pattern="\d{6}"
                             placeholder='Zipcode' 
                         />
                         {errors.zipcode && <p className='text-red-500 text-xs mt-1'>{errors.zipcode}</p>}
@@ -323,7 +389,7 @@ const PlaceOrder = () => {
                         name='phone' 
                         value={formData.phone} 
                         className={`border ${errors.phone ? 'border-red-500' : 'border-gray-300'} rounded py-1.5 px-3.5 w-full`} 
-                        type="number" 
+                        type="text" 
                         placeholder='Phone' 
                     />
                     {errors.phone && <p className='text-red-500 text-xs mt-1'>{errors.phone}</p>}
